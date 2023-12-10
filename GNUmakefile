@@ -12,3 +12,6 @@ generate:
 # See https://golangci-lint.run/
 lint:
 	golangci-lint run
+
+fmt:
+	go fmt ./...

@@ -2,8 +2,8 @@ package provider
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/base64"
-	"math/rand"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
