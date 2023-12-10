@@ -1,33 +1,33 @@
 package provider
 
 import (
-    "context"
-		"encoding/base64"
-		"math/rand"
+	"context"
+	"crypto/rand"
+	"encoding/base64"
 
-    "github.com/hashicorp/terraform-plugin-framework/resource"
-    "github.com/hashicorp/terraform-plugin-framework/resource/schema"
-		"github.com/hashicorp/terraform-plugin-framework/types"
-		"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
-		"golang.org/x/crypto/curve25519"
+	"golang.org/x/crypto/curve25519"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-    _ resource.Resource = &x25519Resource{}
+	_ resource.Resource = &x25519Resource{}
 )
 
 // x25519ResourceModel maps the resource schema data.
 type x25519ResourceModel struct {
-	ID          				types.String     			`tfsdk:"id"`
-  PrivateKey					types.String					`tfsdk:"private_key"`
-  PublicKey      			types.String					`tfsdk:"public_key"`
+	ID         types.String `tfsdk:"id"`
+	PrivateKey types.String `tfsdk:"private_key"`
+	PublicKey  types.String `tfsdk:"public_key"`
 }
 
 // NewX25519Resource is a helper function to simplify the provider implementation.
 func NewX25519Resource() resource.Resource {
-    return &x25519Resource{}
+	return &x25519Resource{}
 }
 
 // x25519Resource is the resource implementation.
@@ -35,23 +35,31 @@ type x25519Resource struct{}
 
 // Metadata returns the resource type name.
 func (r *x25519Resource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-    resp.TypeName = req.ProviderTypeName + "_private_key"
+	resp.TypeName = req.ProviderTypeName + "_private_key"
 }
 
 // Schema defines the schema for the resource.
 func (r *x25519Resource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-			Attributes: map[string]schema.Attribute{
-					"id": schema.StringAttribute{
-							Computed: true,
-					},
-					"private_key": schema.StringAttribute{
-							Computed: true,
-					},
-					"public_key": schema.StringAttribute{
-							Computed: true,
-					},
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				Computed: true,
+				MarkdownDescription: "Unique identifier for this resource: " +
+					"hexadecimal representation of the SHA1 checksum of the resource.",
 			},
+			"private_key": schema.StringAttribute{
+				Computed:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Base64 encoded private key data [(RFC 7748)](https://datatracker.ietf.org/doc/html/rfc7748#section-5) format.",
+			},
+			"public_key": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "Base64 encoded public key data [(RFC 7748)](https://datatracker.ietf.org/doc/html/rfc7748#section-5) format.",
+			},
+		},
+		MarkdownDescription: "Generates a base64-encoded private key for Curve25519. " +
+			"[(RFC 7748)](https://datatracker.ietf.org/doc/html/rfc7748#section-5).\n\n" +
+			"This resource is primarily intended for easily bootstrapping throwaway development environments.",
 	}
 }
 
@@ -64,7 +72,7 @@ func (r *x25519Resource) Create(ctx context.Context, req resource.CreateRequest,
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
-			return
+		return
 	}
 
 	// Generate a random 32-byte private key
@@ -116,7 +124,7 @@ func (r *x25519Resource) Create(ctx context.Context, req resource.CreateRequest,
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
-			return
+		return
 	}
 }
 
