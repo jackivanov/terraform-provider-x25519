@@ -38,12 +38,7 @@ func main() {
     flag.Parse()
 
     opts := providerserver.ServeOpts{
-        // NOTE: This is not a typical Terraform Registry provider address,
-        // such as registry.terraform.io/hashicorp/x25519. This specific
-        // provider address is used in these tutorials in conjunction with a
-        // specific Terraform CLI configuration for manual development testing
-        // of this provider.
-        Address: "hashicorp.com/edu/x25519",
+        Address: "registry.terraform.io/jackivanov/x25519",
         Debug:   debug,
     }
 
