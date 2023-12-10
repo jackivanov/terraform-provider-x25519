@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -21,8 +24,10 @@ jobs:
     - name: Install Make
       run: sudo apt-get install make
 
-    - name: Run make lint
-      run: make lint
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.54
 
     - name: Run make testacc
       run: make testacc
