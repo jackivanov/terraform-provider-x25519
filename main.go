@@ -32,20 +32,19 @@ var (
 )
 
 func main() {
-    var debug bool
+	var debug bool
 
-    flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
-    flag.Parse()
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.Parse()
 
-    opts := providerserver.ServeOpts{
-        Address: "registry.terraform.io/jackivanov/x25519",
-        Debug:   debug,
-    }
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/jackivanov/x25519",
+		Debug:   debug,
+	}
 
-    err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	err := providerserver.Serve(context.Background(), provider.New(version), opts)
 
-    if err != nil {
-        log.Fatal(err.Error())
-    }
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
-

@@ -1,13 +1,13 @@
 package provider
 
 import (
-  "context"
+	"context"
 	"encoding/base64"
 
-  "github.com/hashicorp/terraform-plugin-framework/datasource"
-  "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"golang.org/x/crypto/curve25519"
@@ -15,14 +15,14 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-  _ datasource.DataSource = &x25519DataSource{}
+	_ datasource.DataSource = &x25519DataSource{}
 )
 
 // x25519Model maps x25519 schema data.
 type x25519DataSourceModel struct {
-	ID      						types.String   				`tfsdk:"id"`
-  PrivateKey					types.String					`tfsdk:"private_key"`
-  PublicKey      			types.String					`tfsdk:"public_key"`
+	ID         types.String `tfsdk:"id"`
+	PrivateKey types.String `tfsdk:"private_key"`
+	PublicKey  types.String `tfsdk:"public_key"`
 }
 
 // x25519DataSource is the data source implementation.
@@ -30,29 +30,37 @@ type x25519DataSource struct{}
 
 // Schema defines the schema for the data source.
 func (d *x25519DataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
-  resp.Schema = schema.Schema{
-    Attributes: map[string]schema.Attribute{
-      "id": schema.StringAttribute{
-        Computed: true,
-      },
-			"public_key": schema.StringAttribute{
+	resp.Schema = schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				Computed: true,
+				MarkdownDescription: "Unique identifier for this resource: " +
+					"hexadecimal representation of the SHA1 checksum of the resource.",
+			},
+			"public_key": schema.StringAttribute{
+				Computed:            true,
+				MarkdownDescription: "Base64 encoded public key data [(RFC 7748)](https://datatracker.ietf.org/doc/html/rfc7748#section-5) format.",
 			},
 			"private_key": schema.StringAttribute{
-				Required:  true,
+				Required:            true,
+				Sensitive:           true,
+				MarkdownDescription: "Base64 encoded private key data [(RFC 7748)](https://datatracker.ietf.org/doc/html/rfc7748#section-5) format.",
 			},
-    },
-  }
+		},
+		MarkdownDescription: "Get a public key from a base64-encoded private key for Curve25519. " +
+			"[(RFC 7748)](https://datatracker.ietf.org/doc/html/rfc7748#section-5).\n\n" +
+			"This resource is primarily intended for easily bootstrapping throwaway development environments.",
+	}
 }
 
 // NewX25519DataSource is a helper function to simplify the provider implementation.
 func NewX25519DataSource() datasource.DataSource {
-  return &x25519DataSource{}
+	return &x25519DataSource{}
 }
 
 // Metadata returns the data source type name.
 func (d *x25519DataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-  resp.TypeName = req.ProviderTypeName + "_public_key"
+	resp.TypeName = req.ProviderTypeName + "_public_key"
 }
 
 // Read refreshes the Terraform state with the latest data.
@@ -115,10 +123,9 @@ func (d *x25519DataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	// Set the state in the response
 	tflog.Info(ctx, "Setting the state")
-  diags := resp.State.Set(ctx, &state)
-  resp.Diagnostics.Append(diags...)
-  if resp.Diagnostics.HasError() {
-    return
-  }
+	diags := resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
-
