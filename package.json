@@ -1,0 +1,23 @@
+{
+  "name": "terraform-provider-x25519",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jackivanov/terraform-provider-x25519"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/npm",
+        {
+          "npmPublish": false
+        }
+      ]
+    ]
+  }
+}
